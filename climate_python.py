@@ -11,8 +11,9 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
+from flask import Flask, render_template, redirect, jsonify
 
-engine = create_engine("sqlite:///hawaii.sqlite", connect_args={'check_same_thread': False})
+engine = create_engine("sqlite:///hawaii.sqlite")
 Base = automap_base()
 
 
@@ -134,21 +135,23 @@ temp_twelve_month = session.query(measurement.tobs).\
 
 #frequencies = column(hist_data, 1)
 
+sel = [func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)]
 
 def start_tobs_measures(startdate):
-    data = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).\
+    data = session.query(*sel).\
     filter(measurement.date >= str(startdate)).all()
     return data
     
 
 def end_tobs_measures(start, end):
-    data = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).\
-    filter((measurement.date >= str(start)) & (measurement.date <= str(end))).all()
-    return data
+    results = session.query(*sel).\
+        filter(measurement.date >= start).\
+        filter(measurement.date <= end).all()
+    return results
 
 print(start_tobs_measures(2016-8-3))
 
-print(end_tobs_measures(2016-8-3, 2016-9-3))
+print(end_tobs_measures(2016-8-3, 2017-9-3))
 
 #len(temp_df.value_counts())
 
