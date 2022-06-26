@@ -7,9 +7,9 @@ import json
 import numpy as np
 import pandas as pd
 from bson import json_util
-from climate_python import prcp_dic, station_names, temp_twelve_month, start_tobs_measures
+from climate_python import prcp_dic, station_names, temp_twelve_month, start_tobs_measures, end_tobs_measures
 
-engine = create_engine("sqlite:///hawaii.sqlite")
+engine = create_engine("sqlite:///hawaii.sqlite", connect_args={'check_same_thread': False})
 Base = automap_base()
 
 
@@ -56,9 +56,12 @@ def tobs():
 
 @app.route("/api/v1.0/<start>")
 def start(start):
-    data = start_tobs_measures(start)
-    return json_util.dumps(data)
+    return json_util.dumps(start_tobs_measures(start))
     
+
+@app.route("/api/v1.0/<start>/<end>")
+def end(start, end):
+    return json_util.dumps(end_tobs_measures(start, end))
 
 
 

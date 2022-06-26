@@ -12,7 +12,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
-engine = create_engine("sqlite:///hawaii.sqlite")
+engine = create_engine("sqlite:///hawaii.sqlite", connect_args={'check_same_thread': False})
 Base = automap_base()
 
 
@@ -136,11 +136,19 @@ temp_twelve_month = session.query(measurement.tobs).\
 
 
 def start_tobs_measures(startdate):
-    return
-    session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).\
-    filter(measurement.date >= startdate).all()
+    data = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).\
+    filter(measurement.date >= str(startdate)).all()
+    return data
+    
+
+def end_tobs_measures(start, end):
+    data = session.query(func.min(measurement.tobs), func.max(measurement.tobs), func.avg(measurement.tobs)).\
+    filter((measurement.date >= str(start)) & (measurement.date <= str(end))).all()
+    return data
 
 print(start_tobs_measures(2016-8-3))
+
+print(end_tobs_measures(2016-8-3, 2016-9-3))
 
 #len(temp_df.value_counts())
 
