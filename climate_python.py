@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 from flask import Flask, render_template, redirect, jsonify
 
-engine = create_engine("sqlite:///hawaii.sqlite")
+engine = create_engine("sqlite:///hawaii.sqlite", connect_args={'check_same_thread': False})
 Base = automap_base()
 
 
@@ -144,14 +144,16 @@ def start_tobs_measures(startdate):
     
 
 def end_tobs_measures(start, end):
+    start=dt.datetime.strptime(start, '%Y-%m-%d')
+    end=dt.datetime.strptime(end, '%Y-%m-%d')
     results = session.query(*sel).\
         filter(measurement.date >= start).\
         filter(measurement.date <= end).all()
     return results
 
-print(start_tobs_measures(2016-8-3))
+print(start_tobs_measures('2016-8-3'))
 
-print(end_tobs_measures(2016-8-3, 2017-9-3))
+print(end_tobs_measures('2016-8-3', '2017-9-3'))
 
 #len(temp_df.value_counts())
 
